@@ -74,7 +74,7 @@ function reconnect(attempts) {
   } else {
     // Jika attempts lebih dari 10, yang berarti sudah melebihi batas waktu satu menit
     console.log(
-      "Bot tidak dapat login ke server setelah satu menit. Berhenti mencoba..."
+      "Bot tidak dapat login ke server setelah satu menit. Program Dihentikan silahkan dirunning kembali..."
     ); // Menampilkan pesan di konsol
     process.exit(); // Keluar dari program
   }
