@@ -3,7 +3,7 @@ var mineflayer = require("mineflayer"); // Impor modul mineflayer
 var options = {
   host: "OtogaMaru.aternos.me", // IP server Minecraft
   port: 21823, // Port server Minecraft
-  username: "RockBoy", // Email akun Minecraft
+  username: "RockMan", // Email akun Minecraft
   //   password: 'password' // Password akun Minecraft
 };
 
@@ -38,46 +38,60 @@ function formatTime(ms) {
 }
 
 // Fungsi untuk membuat koneksi ulang jika bot terputus dari server
-function reconnect(attempts) {
+function reconnect() {
+  var attempts = 0;
+  var errorAttempsts = 0;
   // Menambahkan parameter attempts untuk menghitung jumlah percobaan koneksi ulang
-  if (attempts <= 10) {
-    // Mengecek apakah attempts kurang dari atau sama dengan 10, yang berarti belum melebihi batas waktu satu menit
-    bot = mineflayer.createBot(options, { checkTimeoutInterval: 60000 }); // Membuat bot dengan opsi dan interval timeout yang ditentukan
-    bot.on("kicked", function (reason, loggedIn) {
-      // Menangani event 'kicked' saat bot diusir dari server
-      if (loggedIn) {
-        // Jika bot sudah login sebelumnya
-        console.log(
-          "Bot telah di kick dari server. Mencoba untuk login kembali..." // Menampilkan pesan di konsol
-        );
-        reconnect(attempts + 1); // Memanggil fungsi reconnect dengan menambahkan attempts dengan 1
-      } else {
-        // Jika bot belum login sebelumnya dan gagal masuk server
-        console.log(
-          "Bot gagal login ke server. Mencoba untuk login kembali..." // Menampilkan pesan di konsol
-        );
-        reconnect(attempts + 1); // Memanggil fungsi reconnect dengan menambahkan attempts dengan 1
-      }
-    });
-    bot.on("spawn", function () {
-      // Menangani event 'spawn' saat bot berhasil masuk server
-      console.log("Bot berhasil login ke server!"); // Menampilkan pesan di konsol
-      bot.chat(greeting); // Mengirim pesan sapaan saat bot masuk server
-      setInterval(checkTime, 60 * 1000); // Mengatur interval untuk mengecek waktu berjalan setiap menit
-      bot.on("chat", chatHandler); // Mengatur listener untuk event 'chat'
-    });
-    bot.on("error", function (err) {
-      // Menangani event 'error' saat terjadi kesalahan koneksi
-      console.log("Terjadi kesalahan koneksi:", err); // Menampilkan pesan di konsol
+  // Mengecek apakah attempts kurang dari atau sama dengan 10, yang berarti belum melebihi batas waktu satu menit
+  bot = mineflayer.createBot(options, { checkTimeoutInterval: 60000 }); // Membuat bot dengan opsi dan interval timeout yang ditentukan
+  bot.on("kicked", function (reason, loggedIn) {
+    // Menangani event 'kicked' saat bot diusir dari server
+    if (loggedIn) {
+      // Jika bot sudah login sebelumnya
+      console.log(
+        "Bot telah di kick dari server. Mencoba untuk login kembali... " +
+          "(" +
+          attempts +
+          ")" // Menampilkan pesan di konsol
+      );
       reconnect(attempts + 1); // Memanggil fungsi reconnect dengan menambahkan attempts dengan 1
-    });
-  } else {
-    // Jika attempts lebih dari 10, yang berarti sudah melebihi batas waktu satu menit
+    } else {
+      // Jika bot belum login sebelumnya dan gagal masuk server
+      errorAttempsts + 1;
+      console.log(
+        "Bot gagal login ke server. Mencoba untuk login kembali..." +
+          "(" +
+          attempts +
+          ")" +
+          " Error Attempts : " +
+          errorAttempsts // Menampilkan pesan di konsol
+      );
+      reconnect(attempts + 1); // Memanggil fungsi reconnect dengan menambahkan attempts dengan 1
+    }
+    //   if ((checkTimeoutInterval = 60000)) {
+    //     // Jika attempts lebih dari 10, yang berarti sudah melebihi batas waktu satu menit
+    //     console.log(
+    //       "Bot tidak dapat login ke server setelah satu menit. Berhenti mencoba..."
+    //     ); // Menampilkan pesan di konsol
+    //     process.exit(); // Keluar dari program
+    //   }
+  });
+  bot.on("spawn", function () {
+    // Menangani event 'spawn' saat bot berhasil masuk server
+    console.log("Bot berhasil login ke server!"); // Menampilkan pesan di konsol
+    bot.chat(greeting); // Mengirim pesan sapaan saat bot masuk server
+    setInterval(checkTime, 60 * 1000); // Mengatur interval untuk mengecek waktu berjalan setiap menit
+    bot.on("chat", chatHandler); // Mengatur listener untuk event 'chat'
+  });
+  bot.on("error", function (err) {
+    // Menangani event 'error' saat terjadi kesalahan koneksi
+    errorAttempsts + 1;
     console.log(
-      "Bot tidak dapat login ke server setelah satu menit. Program Dihentikan silahkan dirunning kembali..."
+      "Terjadi kesalahan koneksi:" + "(" + errorAttempsts + ") ",
+      err
     ); // Menampilkan pesan di konsol
-    process.exit(); // Keluar dari program
-  }
+    reconnect(attempts + 1); // Memanggil fungsi reconnect dengan menambahkan attempts dengan 1
+  });
 }
 
 reconnect(0); // Memanggil fungsi reconnect untuk pertama kali dengan nilai attempts awal 0
